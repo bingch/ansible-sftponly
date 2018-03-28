@@ -11,14 +11,14 @@ Use shell-user role (https://github.com/bingch/ansible-shell-user) to handle act
 Role Variables
 <pre>
 --------------
-<b>sfponly_config</b>: main list holds all sftp user's conf, each element can have:
+<b>sftponly_config</b>: main list holds all sftp user's conf, each element can have:
   <b>sftp_root</b>: optional, default to /home/sftponly, it must be owned by root
-  sftp_user: user owns the download/upload folder, if defined it must be member of ftp_users list
+  <b>sftp_user</b>: user owns the download/upload folder, if defined it must be member of ftp_users list
   (see below)
-  sftp_group: group used for "Match Group" config stanza of sshd
-  sftp_other_dirs: optional, subdirs/links inside sftp user's chroot folder that needs special 
+  <b>sftp_group</b>: group used for "Match Group" config stanza of sshd
+  <b>sftp_other_dirs</b>: optional, subdirs/links inside sftp user's chroot folder that needs special 
   ownership/group or permisson mode
-  sftp_users: optional, a list of user meta files (see shell-user role for more details
+  <b>sftp_users</b>: optional, a list of user meta files (see shell-user role for more details
 </pre>
 Dependencies
 ------------
