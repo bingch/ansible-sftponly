@@ -18,7 +18,7 @@ Role Variables
   <b>sftp_group</b>: group used for "Match Group" config stanza of sshd
   <b>sftp_other_dirs</b>: optional, subdirs/links inside sftp user's chroot folder that needs special 
   ownership/group or permisson mode
-  <b>sftp_users</b>: optional, a list of user meta files (see shell-user role for more details
+  <b>sftp_users</b>: optional, a list of user meta files (see shell-user role for more details)
 </pre>
 Dependencies
 ------------
