@@ -9,6 +9,7 @@ Requirements
 Use shell-user role (https://github.com/bingch/ansible-shell-user) to handle actual user creation
 
 Role Variables
+<pre>
 --------------
 sfponly_config: main list holds all sftp user's conf, each element can have:
   sftp_root: optional, default to /home/sftponly, it must be owned by root
@@ -16,7 +17,7 @@ sfponly_config: main list holds all sftp user's conf, each element can have:
   sftp_group: group used for "Match Group" config stanza of sshd
   sftp_other_dirs: optional, subdirs/links inside sftp user's chroot folder that needs special ownership/group or permisson mode
   sftp_users: optional, a list of user meta files (see shell-user role for more details
-
+</pre>
 Dependencies
 ------------
 - tcpwrapper
