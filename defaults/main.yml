@@ -1,0 +1,4 @@
+---
+# defaults file for sftponly
+sftponly_config: []
+sftponly_root: /home/sftponly

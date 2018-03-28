@@ -1,0 +1,13 @@
+{% if item.sftp_user is defined %}
+Match User {{ item.sftp_user }}
+{% else %}
+Match Group {{ item.sftp_group }}
+{% endif %}
+     ChrootDirectory {{ item.sftp_root | default('%h') }}
+{% if item.sftp_allow_tcp_forward is defined %}
+     AllowTCPForwarding {{ item.sftp_allow_tcp_forward }}
+{% endif %}
+{% if item.sftp_x11_forward is defined %}    
+     X11Forwarding {{ item.sftp_x11forward }}
+{% endif %}
+     ForceCommand {{ 'internal-sftp' + (item.sftp_option | default('')) }}

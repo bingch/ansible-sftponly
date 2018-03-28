@@ -1,0 +1,7 @@
+---
+
+username: john
+comment: 'Restricted User'
+group: sftponly
+shell: '/sbin/nologin'
+ssh_key_files: "{{ john_ssh_key_files | default([]) }}"

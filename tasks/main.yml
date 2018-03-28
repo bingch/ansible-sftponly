@@ -1,0 +1,82 @@
+---
+# tasks file for sftponly
+
+- name: Add sftp subsystem entry
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^Subsystem(\s+)sftp'
+    line: "Subsystem sftp internal-sftp"
+    state: present
+  when: sftponly_config is defined
+  notify: SFTPONLY Reload sshd
+
+- name: Create sftp group
+  group:
+    name: "{{ item.sftp_group }}"
+    gid: "{{ item.sftp_group_gid | default(omit) }}"
+    state: present
+  when: item.sftp_group is defined
+  with_items: "{{ sftponly_config }}"
+
+- name: Create sftp_root
+  file:
+    path: "{{ item.sftp_root | default(sftponly_root) }}"
+    owner: root
+    group: "{{ item.sftp_root_group | default('root') }}"
+    mode: "{{ item.sftp_root_mode | default(omit) }}"
+    state: directory
+  when: item.sftp_root is defined
+  with_items: "{{ sftponly_config }}"
+
+- name: Construct sshd_config block
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: '# {mark} sftponly {{ item.sftp_user if item.sftp_user is defined else item.sftp_group }} block'
+    content: "{{ lookup('template', 'templates/sftp_sshd_config.j2') }}"
+  with_items: "{{ sftponly_config }}"
+  notify: SFTPONLY Reload sshd
+
+- name: Create sftp users
+  include_role:
+    name: shell-user
+  vars:
+    user_meta: "{{ sftponlyloop.1 }}"
+  with_subelements:
+    - "{{ sftponly_config }}"
+    - sftp_users
+    - flags:
+      skip_missing: True 
+  loop_control:
+    loop_var: sftponlyloop
+
+- name: Create other directories
+  file:
+    src:   "{{ item.1.src | default(omit) }}"
+    path:  "{{ item.1.path }}"
+    owner: "{{ item.1.owner | default(item.0.sftp_user) }}"
+    group: "{{ item.1.group | default(item.0.sftp_user) }}"
+    mode:  "{{ item.1.mode | default('0755') }}"
+    state: "{{ item.1.state | default('directory') }}"
+  with_subelements:
+    - "{{ sftponly_config }}"
+    - sftp_other_dirs
+    - flags:
+      skip_missing: True
+
+# TODO do we still need it? works fine on rhel 7
+#- name: Ensure SELinux management package is present
+#  package:
+#    name: "{{ 'python-semanage' if ansible_distribution == 'Debian' else 'libsemanage-python' }}"
+#    state: present
+#  when: ansible_selinux
+#
+#- name: Set SELinux booleans
+#  seboolean:
+#    name: "{{ item }}"
+#    state: yes
+#    persistent: yes
+#  with_items:
+#    - ssh_chroot_full_access
+#    - ssh_chroot_rw_homedirs
+#  when: ansible_selinux
+
