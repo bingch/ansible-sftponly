@@ -1,0 +1,49 @@
+---
+- name: Add sftp only user to servers
+  hosts: all
+  remote_user: root
+
+  tasks:
+    - name: clean up john
+      include_role:
+        name: shell-user
+      vars:
+        default_home_remove: true 
+        default_remove_force: true
+        users_delete_list:
+          - 'meta/john.yml'
+
+    - name: clean up ftp root
+      file:
+        path: /var/sftp
+        state: absent
+
+    - name: clean up group
+      group:
+        name: sftponly
+        state: absent
+
+    - name: clean up sshd_config block
+      blockinfile:
+        dest: /etc/ssh/sshd_config
+        marker: '# {mark} sftponly sftponly block'
+        content: |
+          Match Group sftponly
+            ChrootDirectory /var/sftp
+            ForceCommand internal-sftp
+        state: absent
+      notify: SFTPONLY Reload sshd
+
+    - name: clean up sftp subsystem entry
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^Subsystem(\s+)sftp'
+        line: "Subsystem sftp /usr/libexec/openssh/sftp-server"
+        state: present
+      notify: SFTPONLY Reload sshd
+
+  handlers:
+    - name:  SFTPONLY Reload sshd
+      service:
+        name: "{{ 'ssh' if ansible_os_family == 'Debian' else 'sshd' }}"
+        state: reloaded

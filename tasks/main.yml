@@ -7,7 +7,7 @@
     regexp: '^Subsystem(\s+)sftp'
     line: "Subsystem sftp internal-sftp"
     state: present
-  when: sftponly_config is defined
+  when: sftponly_config | length > 0
   notify: SFTPONLY Reload sshd
 
 - name: Create sftp group
@@ -36,18 +36,23 @@
   with_items: "{{ sftponly_config }}"
   notify: SFTPONLY Reload sshd
 
+- name: Initiate users_lists
+  set_fact:
+        tmp_users_lists: []
+
+- name: Add sftp_users to users_lists
+  set_fact:
+    tmp_users_lists: "{{tmp_users_lists}} + [ '{{ item.1 }}' ] "
+  with_subelements:
+    - "{{ sftponly_config }}"
+    - sftp_users
+    - skip_missing: yes
+
 - name: Create sftp users
   include_role:
     name: shell-user
   vars:
-    user_meta: "{{ sftponlyloop.1 }}"
-  with_subelements:
-    - "{{ sftponly_config }}"
-    - sftp_users
-    - flags:
-      skip_missing: True 
-  loop_control:
-    loop_var: sftponlyloop
+    users_list: "{{ tmp_users_lists }}"
 
 - name: Create other directories
   file:
@@ -62,6 +67,7 @@
     - sftp_other_dirs
     - flags:
       skip_missing: True
+  when: not ansible_check_mode
 
 # TODO do we still need it? works fine on rhel 7
 #- name: Ensure SELinux management package is present

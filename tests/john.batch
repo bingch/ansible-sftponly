@@ -1,0 +1,4 @@
+cd download
+put john.batch
+lcd /tmp
+get john.batch

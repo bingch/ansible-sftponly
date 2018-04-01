@@ -1,13 +1,14 @@
 ---
 - name: Add sftp only user to servers
   hosts: all
-  become: yes
+  remote_user: root
 
   tasks:
     - name: Add sftp only user to servers
       include_role:
         name: sftponly
       vars:
+        override_existing_user: true
         sftponly_config:
           - sftp_root: /var/sftp
             sftp_group: sftponly
@@ -16,4 +17,4 @@
                  owner: john
                  group: sftp_users
             sftp_users:
-              - john.yml
+              - 'meta/john.yml'
