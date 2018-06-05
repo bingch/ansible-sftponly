@@ -6,7 +6,7 @@ Roles to add sftp only user
 Requirements
 ------------
 
-Use shell-user role (https://github.com/bingch/ansible-shell-user) to handle actual user creation
+Use shell-user role (https://gitlab.com/bingch/ansible-shell-user) to handle actual user creation
 
 Role Variables
 <pre>
@@ -55,4 +55,4 @@ Author Information
 ------------------
 
 bingch
-https://github.com/bingch
+https://gitlab.com/bingch
